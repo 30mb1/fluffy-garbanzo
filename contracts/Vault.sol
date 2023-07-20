@@ -4,10 +4,12 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./GasWallet.sol";
+import "./ProxyReceiver.sol";
 
 
 contract Vault {
     event NewGasWallet(address gasWallet);
+    event NewProxyReceiver(address proxyReceiver);
     event TokensRedeemed(address token, address wallet, uint amount);
 
     using SafeERC20 for IERC20;
@@ -39,6 +41,10 @@ contract Vault {
 
     function deployGasWallet() external {
         emit NewGasWallet(address(new GasWallet(address(this))));
+    }
+
+    function deployProxyReceiver() external {
+        emit NewProxyReceiver(address(new ProxyReceiver(address(this))));
     }
 
     function withdraw(IERC20[] calldata tokens) external {
