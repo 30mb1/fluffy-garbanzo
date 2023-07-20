@@ -14,7 +14,7 @@ contract ProxyReceiver {
         vault = _vault;
     }
 
-    
+
     function withdraw(IERC20[] calldata tokens) external {
         for (uint i = 0; i < tokens.length; i++) {
             uint balance = tokens[i].balanceOf(address(this));

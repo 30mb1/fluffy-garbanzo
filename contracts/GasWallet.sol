@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
 contract GasWallet {
+    event Trade(Vault.Signature signature, Vault.UniTrade trade, uint256[] amountsOut);
+
     using SafeERC20 for IERC20;
 
     address immutable public vault;
@@ -16,7 +18,7 @@ contract GasWallet {
         vault = _vault;
     }
 
-    function trade(Vault.Signature calldata signature, Vault.UniTrade calldata trade) external {
+    function goTrade(Vault.Signature calldata signature, Vault.UniTrade calldata trade) external {
         Vault(vault).getTokens(signature, trade);
         IERC20 token = IERC20(trade.path[0]);
 
@@ -24,12 +26,13 @@ contract GasWallet {
             token.safeApprove(trade.router, type(uint256).max);
         }
 
-        IUniswapV2Router02(trade.router).swapExactTokensForTokens(
+        uint256[] memory amounts = IUniswapV2Router02(trade.router).swapExactTokensForTokens(
             trade.amountIn,
             trade.amountOutMin,
             trade.path,
             trade.to,
             trade.deadline
         );
+        emit Trade(signature, trade, amounts);
     }
 }

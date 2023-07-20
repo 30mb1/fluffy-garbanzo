@@ -3,9 +3,13 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./GasWallet.sol";
 
 
 contract Vault {
+    event NewGasWallet(address gasWallet);
+    event TokensRedeemed(address token, address wallet, uint amount);
+
     using SafeERC20 for IERC20;
 
     struct UniTrade {
@@ -33,6 +37,10 @@ contract Vault {
         signer = _signer;
     }
 
+    function deployGasWallet() external {
+        emit NewGasWallet(address(new GasWallet(address(this))));
+    }
+
     function withdraw(IERC20[] calldata tokens) external {
         require (msg.sender == owner, "Vault::withdraw:: not owner");
 
@@ -58,5 +66,6 @@ contract Vault {
         uint amountSpent = trade.amountIn;
 
         tokenSpent.safeTransfer(msg.sender, amountSpent);
+        emit TokensRedeemed(address(tokenSpent), msg.sender, amountSpent);
     }
 }
