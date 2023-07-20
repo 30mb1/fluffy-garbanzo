@@ -31,6 +31,7 @@ contract Vault {
 
     // this address can withdraw balance
     address immutable public owner;
+    // this address can sign transactions for trades
     address immutable public signer;
     uint32 public nonce;
 
@@ -57,8 +58,9 @@ contract Vault {
     }
 
     function checkSign(Signature memory signature) public view returns (bool) {
+        // we append vault address to signature in order to make it unique for every vault in case 2 vaults have 1 signer
         bytes32 ethSignedMessageHash = keccak256(
-            abi.encodePacked("\x19Ethereum Signed Message:\n32", nonce)
+            abi.encodePacked("\x19Ethereum Signed Message:\n32", address(this), nonce)
         );
         address recoveredAddress = ecrecover(ethSignedMessageHash, signature.v, signature.r, signature.s);
         return recoveredAddress == signer;
