@@ -12,8 +12,10 @@ contract VaultFactory {
         owner = _owner;
     }
 
-    function deployVault(address signer) external returns (address) {
-        Vault vault = new Vault(owner, signer);
+    function deployVault(address _signer, address _owner) external returns (address) {
+        require (msg.sender == owner, "VaultFactory::deployVault:: not owner");
+
+        Vault vault = new Vault(_owner, _signer);
         emit NewVault(address(vault));
         return address(vault);
     }
